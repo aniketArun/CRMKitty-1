@@ -1,0 +1,4 @@
+__pychache__
+test.db
+.env
+.env.local
