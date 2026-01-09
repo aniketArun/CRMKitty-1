@@ -2,3 +2,4 @@ __pychache__
 test.db
 .env
 .env.local
+alembic/__pychache__
