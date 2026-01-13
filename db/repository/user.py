@@ -1,0 +1,45 @@
+from sqlalchemy.orm import Session
+from db.models.user import User
+from schemas.user import CreateUser
+from fastapi import HTTPException, status
+from datetime import datetime
+from core.enums import Role
+def create_new_user(user:CreateUser, db:Session):
+    '''
+    Docstring for create_new_user
+    
+    :param user: Description
+    :type user: CreateUser
+    :param db: Description
+    :type db: Session
+    '''
+
+    new_user = User(
+        first_name=user.first_name, 
+        last_name=user.last_name, 
+        email=user.email, 
+        mobile=user.mobile, 
+        location=user.location, 
+        role=user.role if user.role else Role.LEAD_MANAGER.name, 
+        avatar=user.avatar, 
+        created_at=datetime.now(), 
+        is_active=True 
+    )
+    
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+    
+
+
+def show_all_users(db:Session):
+    '''
+    Docstring for show_all_users
+    
+    :param db: Description
+    :type db: Session
+    '''
+    all_users = db.query(User).filter().all()
+
+    return all_users

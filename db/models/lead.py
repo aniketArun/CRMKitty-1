@@ -2,7 +2,7 @@ from db.base_class import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, DateTime
 from core.enums import Status
-import datetime
+from datetime import datetime
 
 
 class Lead(Base):
@@ -20,5 +20,5 @@ class Lead(Base):
 
     refered_by=Column(Integer, nullable=True)
     created_by=Column(Integer, nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow())
+    created_at = Column(DateTime, default=datetime.now)
     updated_at=Column(DateTime, nullable=True)
