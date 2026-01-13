@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from apis.v1 import base
+from apis import base_router
 from core.config import settings
 
 app = FastAPI(
@@ -8,5 +8,5 @@ app = FastAPI(
             description=settings.APP_DESCRIPTION
               )
 
-app.include_router(prefix="/v1", router=base.router)
+app.include_router(prefix="/api", router=base_router.router)
 
