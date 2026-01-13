@@ -15,3 +15,11 @@ class Status(Enum):
     NEGOTIATION:str= "negotiation"
     LOST:str= "lost"
     ACTIVE:str = "active"
+    PAID:str = "paid"
+
+
+class PaymentMethod(Enum):
+    BANK_TRANSFER:str = "bank transfer"
+    CASH:str = "cash"
+    CHEQUE:str = "cheque"
+    UPI:str = "upi"

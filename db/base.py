@@ -5,4 +5,4 @@ from .models.lead import Lead
 from .models.activity_log import ActivityLog
 from .models.customer import Customer
 from .models.product import Product
-
+from .models.invoice import Invoice
