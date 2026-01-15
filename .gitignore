@@ -3,3 +3,4 @@ test.db
 .env
 .env.local
 alembic/__pychache__
+alembic/versions
