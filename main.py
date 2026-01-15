@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from apis import base_router
 from core.config import settings
 from fastapi.responses import RedirectResponse
+from fastapi_pagination import add_pagination
+
 app = FastAPI(
             title=settings.APP_NAME, 
             version=settings.APP_VERSION,
@@ -15,3 +17,4 @@ def redirect_to_docs():
 
 app.include_router(prefix="/api", router=base_router.router)
 
+add_pagination(app)

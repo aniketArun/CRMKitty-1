@@ -6,6 +6,9 @@ from db.session import get_db
 from typing import List
 from services.auth import get_current_user
 from db.models.user import User
+from fastapi_pagination import Page, add_pagination, paginate
+
+
 router = APIRouter()
 
 
@@ -16,10 +19,10 @@ def create_lead(lead:CreateLead, db:Session=Depends(get_db), user:User = Depends
         return new_lead
     raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Not Able to Create Lead!")
 
-@router.get("/", response_model=List[ShowLead], status_code=status.HTTP_200_OK)
+@router.get("/", response_model=Page[ShowLead], status_code=status.HTTP_200_OK)
 def show_leads(db:Session=Depends(get_db)):
     leads = show_all_leads(db = db)
 
     if not leads:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No leads Fount!")
-    return leads
+    return paginate(leads)
