@@ -19,4 +19,5 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, nullable=True)
     password = Column(String, nullable=True)
+    company_id = Column(Integer, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)

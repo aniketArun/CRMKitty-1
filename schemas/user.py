@@ -5,15 +5,16 @@ from typing import Optional, Any
 class ShowUser(BaseModel):
     id: int
     first_name: str
-    last_name: Optional[str]
-    email: Optional[EmailStr]
-    mobile: Optional[str]
-    location: Optional[str]
-    role: Optional[str]
-    avatar: Optional[str]
+    last_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    mobile: Optional[str] = None
+    location: Optional[str] = None
+    role: Optional[str] = None
+    avatar: Optional[str] = None
+    company_id:Optional[int] = None
     is_active:bool
     created_at:Any
-    updated_at:Optional[Any]
+    updated_at:Optional[Any] = None
     class Config:
         orm_mode = True
 

@@ -4,17 +4,16 @@ from sqlalchemy.orm import Session
 from db.repository.leads import create_new_lead, show_all_leads
 from db.session import get_db
 from typing import List
-
-
+from services.auth import get_current_user
+from db.models.user import User
 router = APIRouter()
 
 
 @router.post("/", response_model=ShowLead, status_code=status.HTTP_201_CREATED)
-def create_lead(lead:CreateLead, db:Session=Depends(get_db)):
-    new_lead = create_new_lead(lead=lead, db = db)
-
+def create_lead(lead:CreateLead, db:Session=Depends(get_db), user:User = Depends(get_current_user)):
+    new_lead = create_new_lead(lead=lead, db = db, created_by_user= user)
     if new_lead is not None:
-        return lead
+        return new_lead
     raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Not Able to Create Lead!")
 
 @router.get("/", response_model=List[ShowLead], status_code=status.HTTP_200_OK)

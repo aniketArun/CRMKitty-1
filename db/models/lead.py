@@ -17,7 +17,7 @@ class Lead(Base):
     status = Column(String, default=Status.NEW.name)
     lead_value = Column(Float, nullable=True)
     notes = Column(Text, nullable=True)
-
+    owned_by = Column(Integer, nullable=True)
     refered_by=Column(Integer, nullable=True)
     created_by=Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
