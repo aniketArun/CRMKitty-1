@@ -1,4 +1,10 @@
 from typing import Any, Optional
+import os
+from dotenv import load_dotenv
+
+# Load variables from .env file
+load_dotenv()
+
 
 class Settings():
     APP_NAME:str = "CRMKitty Backend"
@@ -11,4 +17,9 @@ class Settings():
         env_file:str = ".env"
 
     SET_MAIN_OPTION:str = "sqlalchemy.url"
+    ALGORITHM:str = os.getenv("ALGORITHM", "HS256")
+    SECRET_KEY:str = os.getenv("SECRET_KEY", "iqf7ti7456jkiosnjb8478")
+    ACCESS_TOKEN_EXPIRE_MIN:int = int(os.getenv("ACCESS_TOKEN_TIME", "30"))
+    REFRESH_TOKEN_TIME:int = int(os.getenv("REFRESH_TOKEN_TIME")) or 30*60
+
 settings = Settings()

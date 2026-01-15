@@ -25,6 +25,6 @@ class CreateUser(BaseModel):
     location: Optional[str]=None
     role: Optional[str]=None
     avatar: Optional[str]=None
-
+    password:str
     class Config:
         orm_mode = True

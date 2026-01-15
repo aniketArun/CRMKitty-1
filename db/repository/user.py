@@ -4,6 +4,8 @@ from schemas.user import CreateUser
 from fastapi import HTTPException, status
 from datetime import datetime
 from core.enums import Role
+from core.hashing import Hasher
+
 def create_new_user(user:CreateUser, db:Session):
     '''
     Docstring for create_new_user
@@ -23,6 +25,7 @@ def create_new_user(user:CreateUser, db:Session):
         role=user.role if user.role else Role.LEAD_MANAGER.name, 
         avatar=user.avatar, 
         created_at=datetime.now(), 
+        password = Hasher.get_password_hashed(password=user.password),
         is_active=True 
     )
     

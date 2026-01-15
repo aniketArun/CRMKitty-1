@@ -18,5 +18,5 @@ class User(Base):
     two_factor_auth = Column(Boolean, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, nullable=True)
-
+    password = Column(String, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
