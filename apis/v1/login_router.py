@@ -7,6 +7,7 @@ from db.session import get_db
 from core.hashing import Hasher
 from db.repository.login import get_user_by_email
 from jose import jwt, JWTError
+from schemas.user import ShowUser
 
 router = APIRouter()
 
@@ -21,3 +22,8 @@ def login_for_access_token(form_data:OAuth2PasswordRequestForm = Depends(), db:S
     access_token = create_access_token(data = {"sub":user.email})
     return {"access_token":access_token, "token_type":"bearer"}
 
+@router.get("/me", response_model=ShowUser, status_code=status.HTTP_200_OK)
+def get_me(user = Depends(get_current_user)):
+    if user is None:
+        raise HTTPException(detail="Not able to find user with the assocaited token", status_code=status.HTTP_404_NOT_FOUND)
+    return user

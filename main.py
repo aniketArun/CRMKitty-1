@@ -10,7 +10,7 @@ app = FastAPI(
             description=settings.APP_DESCRIPTION
               )
 
-@app.get("/")
+@app.get("/", tags=["Base URL"], description="Redirects to docs on \/")
 def redirect_to_docs():
     # Redirects with a default status code of 307 (Temporary Redirect)
     return RedirectResponse(url="/docs")
