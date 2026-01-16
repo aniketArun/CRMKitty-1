@@ -34,3 +34,18 @@ class CreateReport(BaseModel):
 
     class Config():
         orm_mode = True
+
+
+
+class UpdateReport(BaseModel):
+    company_id:Optional[int] = None
+    title:Optional[str] = None
+    customer_id:Optional[int] = None
+    report_summary:Optional[str] = None
+    test_cases:List[dict] = None
+    remarks:Optional[str] = None
+    status:str = None
+    updated_at:Optional[datetime] = datetime.now
+
+    class Config():
+        orm_mode = True
