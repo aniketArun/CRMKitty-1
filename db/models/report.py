@@ -15,5 +15,6 @@ class Report(Base):
     status = Column(String, default=Status.NEW.name)
     created_by = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
+    updated_by = Column(Integer, nullable=True)
     updated_at = Column(DateTime, nullable=True)
 

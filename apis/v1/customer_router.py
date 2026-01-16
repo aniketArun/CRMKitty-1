@@ -23,16 +23,13 @@ from schemas.customer import (
 
 router = APIRouter()
 
+@router.get("/", response_model=Page[ShowCustomer], status_code=status.HTTP_200_OK)
+def all_customers(db:Session = Depends(get_db)):
+    customers = get_all_customers(db=db)
 
-@router.get("/<id:int>", response_model=ShowCustomer, status_code=status.HTTP_200_OK)
-def get_customer(id:int, user:User = Depends(get_current_user), db:Session = Depends(get_db)):
-    customer = get_customer_by_id(id= id, db=db)
-
-    if customer is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customer Found, Create One!")
-    return customer
-
-
+    if customers is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")
+    return paginate(customers)
 
 @router.post("/", response_model=CreateCustomer, status_code=status.HTTP_201_CREATED)
 def create_customer(customer:CreateCustomer, db:Session = Depends(get_db), user:User = Depends(get_current_user)):
@@ -42,14 +39,13 @@ def create_customer(customer:CreateCustomer, db:Session = Depends(get_db), user:
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Not able to create Customer!")
     return new_customer
 
+@router.get("/<id:int>", response_model=ShowCustomer, status_code=status.HTTP_200_OK)
+def get_customer(id:int, user:User = Depends(get_current_user), db:Session = Depends(get_db)):
+    customer = get_customer_by_id(id= id, db=db)
 
-@router.get("/", response_model=Page[ShowCustomer], status_code=status.HTTP_200_OK)
-def all_customers(db:Session = Depends(get_db)):
-    customers = get_all_customers(db=db)
-
-    if customers is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")
-    return paginate(customers)
+    if customer is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customer Found, Create One!")
+    return customer
 
 @router.put("/<id:int>", response_model=ShowCustomer, status_code=status.HTTP_202_ACCEPTED)
 def update_customer(id:int, data:UpdateCustomer, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
@@ -61,7 +57,7 @@ def update_customer(id:int, data:UpdateCustomer, by_user:User = Depends(get_curr
 
 @router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED)
 def delete_customer(id:int, user:User=Depends(get_current_user), db:Session =Depends(get_db)):
-    transaction = delete_cust_by_id(id=id)
+    transaction = delete_cust_by_id(id=id, db=db)
     if transaction:
         return Response({"Message":"Customer Deleted!"}, status_code=status.HTTP_202_ACCEPTED)
     

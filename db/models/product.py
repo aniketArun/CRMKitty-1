@@ -13,9 +13,9 @@ class Product(Base):
     price = Column(Float, nullable=True)
     stock = Column(Integer, nullable=True)
     tax = Column(Float, nullable=True)
-
     owned_by = Column(Integer, nullable=True)
     created_by = Column(Integer, nullable=True)
+    updated_by = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, nullable=True)
     

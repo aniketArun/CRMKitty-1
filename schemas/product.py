@@ -17,7 +17,7 @@ class ShowProduct(BaseModel):
     owned_by:Optional[int] = None
     created_by:Optional[int] = None
     created_at:datetime = Field(default_factory=datetime.now)
-
+    updated_by:Optional[int] = None
     updated_at:Optional[datetime]=None
 
     class Config():
@@ -41,6 +41,22 @@ class CreateProduct(BaseModel):
     created_at:datetime = Field(default_factory=datetime.now)
 
     updated_at:Optional[datetime]=None
+
+    class Config():
+        orm_mode = True
+
+
+class UpdateProduct(BaseModel):
+    product_name:Optional[str] = None
+    sku_code:Optional[str] = None
+    description:Optional[str] = None
+    category:Optional[str] = None
+    status:Optional[str] = Status.ACTIVE.name
+    price:Optional[float] = None
+    stock:Optional[int] = None
+    tax:Optional[float] = None
+
+    updated_at:Optional[datetime]=datetime.now
 
     class Config():
         orm_mode = True

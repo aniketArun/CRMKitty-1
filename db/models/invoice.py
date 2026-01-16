@@ -18,5 +18,6 @@ class Invoice(Base):
     items = Column(MutableList.as_mutable(JSON), nullable=False)
 
     created_by = Column(Integer, nullable=True)
+    updated_by = Column(Integer, nullable=True)
     created_at = Column(DateTime, default= datetime.now)
     updated_at = Column(DateTime, nullable=True)
