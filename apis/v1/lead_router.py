@@ -43,7 +43,7 @@ def update_lead(
 
 
 @router.get("/<id:int>", response_model=ShowLead, status_code=status.HTTP_202_ACCEPTED)
-def update_lead(
+def get_lead(
     id:int, 
     db:Session = Depends(get_db), 
     user:User = Depends(get_current_user)
@@ -55,7 +55,7 @@ def update_lead(
 
 
 @router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED)
-def update_lead(
+def delete_lead(
     id:int, 
     db:Session = Depends(get_db), 
     user:User = Depends(get_current_user)

@@ -35,6 +35,14 @@ def all_reports(db:Session = Depends(get_db), user:User = Depends(get_current_us
     
     return paginate(reports)
 
+@router.get("/<id:int>", response_model=ShowReport, status_code=status.HTTP_200_OK)
+def get_report_from_id(id:int, by_user:User= Depends(get_current_user), db:Session = Depends(get_db)):
+    report_in_db = get_report_by_id(id=id, by_user=by_user, db=db)
+
+    if report_in_db is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Report Found!")  
+    return report_in_db 
+
 @router.put("/<id:int>", response_model=ShowReport, status_code=status.HTTP_202_ACCEPTED)
 def update_report(id:int, data:UpdateReport, by_user:User= Depends(get_current_user), db:Session = Depends(get_db)):
     report_updated = update_report_by_id(id=id, data=data, by_user=by_user, db=db)
@@ -44,7 +52,7 @@ def update_report(id:int, data:UpdateReport, by_user:User= Depends(get_current_u
     return report_updated      
 
 @router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED)
-def update_report(id:int, by_user:User= Depends(get_current_user), db:Session = Depends(get_db)):
+def delete_report(id:int, by_user:User= Depends(get_current_user), db:Session = Depends(get_db)):
     report = delete_report_by_id(id=id, by_user=by_user, db=db)
 
     if not report:
