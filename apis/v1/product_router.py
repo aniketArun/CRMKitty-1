@@ -33,7 +33,7 @@ def create_product(product:CreateProduct, db:Session = Depends(get_db), by_user:
     return new_product
 
 @router.get("/<id:int>", response_model=ShowProduct, status_code=status.HTTP_200_OK)
-def get_customer(id:int, user:User = Depends(get_current_user), db:Session = Depends(get_db)):
+def get_product(id:int, user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     product = get_product_by_id(id= id, db=db)
 
     if product is None:
