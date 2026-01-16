@@ -1,12 +1,24 @@
-from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi import APIRouter, status, HTTPException, Depends, Response
 from sqlalchemy.orm import Session
 from db.session import get_db
-from db.repository.customer import create_new_customer, get_all_customers, get_customer_by_id, update_cust_by_id
-from schemas.customer import CreateCustomer, ShowCustomer, UpdateCustomer
 from typing import List
 from fastapi_pagination import Page, add_pagination, paginate
 from db.models.user import User
 from services.auth import get_current_user
+
+from db.repository.customer import (
+    create_new_customer,
+    get_all_customers,
+    get_customer_by_id,
+    update_cust_by_id,
+    delete_cust_by_id,
+)
+
+from schemas.customer import (
+    CreateCustomer, 
+    ShowCustomer, 
+    UpdateCustomer
+)
 
 
 router = APIRouter()
@@ -47,3 +59,10 @@ def update_customer(id:int, data:UpdateCustomer, by_user:User = Depends(get_curr
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")
     return cust_updated
 
+@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED)
+def delete_customer(id:int, user:User=Depends(get_current_user), db:Session =Depends(get_db)):
+    transaction = delete_cust_by_id(id=id)
+    if transaction:
+        return Response({"Message":"Customer Deleted!"}, status_code=status.HTTP_202_ACCEPTED)
+    
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")

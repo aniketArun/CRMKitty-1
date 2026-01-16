@@ -52,3 +52,12 @@ def update_cust_by_id(id:int, data:UpdateCustomer, by_user:User, db:Session):
     db.commit()
     db.refresh(cust_in_db)
     return cust_in_db
+
+
+def delete_cust_by_id(id:int,db:Session):
+    cust = db.query(Customer).filter(Customer.id == id).first()
+    if not cust:
+        return False
+    db.delete(cust)
+    db.commit()
+    return True
