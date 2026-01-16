@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from sqlalchemy.orm import Session
 from db.session import get_db
-from db.repository.customer import create_new_customer, get_all_customers, get_customer_by_id
-from schemas.customer import CreateCustomer, ShowCustomer
+from db.repository.customer import create_new_customer, get_all_customers, get_customer_by_id, update_cust_by_id
+from schemas.customer import CreateCustomer, ShowCustomer, UpdateCustomer
 from typing import List
 from fastapi_pagination import Page, add_pagination, paginate
 from db.models.user import User
@@ -38,4 +38,12 @@ def all_customers(db:Session = Depends(get_db)):
     if customers is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")
     return paginate(customers)
+
+@router.put("/<id:int>", response_model=ShowCustomer, status_code=status.HTTP_202_ACCEPTED)
+def update_customer(id:int, data:UpdateCustomer, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
+    cust_updated = update_cust_by_id(id=id, data=data, by_user=by_user, db=db)
+
+    if cust_updated is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")
+    return cust_updated
 

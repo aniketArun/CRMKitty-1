@@ -16,4 +16,5 @@ class Customer(Base):
     created_by = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, nullable=True)
+    updated_by = Column(Integer, nullable = True)
     
