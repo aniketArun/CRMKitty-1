@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from db.models.company import Company
-from schemas.company import CreateCompany
-
-
+from schemas.company import UpdateCompany, CreateCompany
+from db.models.user import User
+from datetime import datetime
 def get_company_from_user_id(id:int, db:Session):
     cp = db.query(Company).filter(id = id).first()
 
@@ -38,7 +38,23 @@ def create_new_company(cp:CreateCompany, db:Session):
 
 def get_all_companies(db:Session):
     queryset = db.query(Company).filter().all()
-
     return queryset
 
+def update_company_by_id(id: int, user: User, data: UpdateCompany, db: Session):
+    cp_in_db = db.query(Company).filter(Company.id == id).first()
+    if cp_in_db is None:
+        return None
+    
+    update_data = data.model_dump(exclude_unset=True)  # only provided keys
+    
+    for key, value in update_data.items():
+        setattr(cp_in_db, key, value)
 
+    cp_in_db.updated_at = datetime.now()
+    cp_in_db.updated_by = user.id
+
+    db.add(cp_in_db)
+    db.commit()
+    db.refresh(cp_in_db)
+
+    return cp_in_db

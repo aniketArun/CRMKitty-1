@@ -46,3 +46,20 @@ class ShowCompany(BaseModel):
 
     class Config():
         orm_mode = True
+
+
+class UpdateCompany(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    logo: Optional[str] = None
+    currency: Optional[str] = None
+    timezone: Optional[str] = None
+    billing_email: Optional[str] = None
+    tax_id: Optional[str] = None
+    billing_address: Optional[str] = None
+    plan_id: Optional[int] = None
+    license_id: Optional[int] = None
+
+    class Config():
+        orm_mode = True
