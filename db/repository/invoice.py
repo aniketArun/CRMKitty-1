@@ -31,3 +31,8 @@ def get_all_invoices(db:Session):
 
     return queryset
 
+
+def get_invoice_by_id(id:int, db:Session):
+    inv_in_db = db.query(Invoice).filter(Invoice.id == id).first()
+    return inv_in_db
+

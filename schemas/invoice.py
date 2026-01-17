@@ -43,3 +43,22 @@ class CreateInvoice(BaseModel):
 
     class Config():
         orm_mode = True
+
+
+
+class UpdateInvoice(BaseModel):
+    invoice_date:Optional[date] = Field(default_factory=date.today)
+    customer_id:Optional[int] = None
+    due_date:Optional[date] = Field(default_factory=date.today)
+    discount:Optional[float] = None
+    paymt_method:Optional[str] = Field(default=PaymentMethod.BANK_TRANSFER.name)
+    status:Optional[str] = Field(default=Status.PAID.name)
+    notes:Optional[str] = None
+    items: Optional[List[dict]] = Field(default_factory=list)
+
+
+    created_by:Optional[int] = None
+    updated_at:Optional[datetime] = None
+
+    class Config():
+        orm_mode = True
