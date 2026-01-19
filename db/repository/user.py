@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from db.models.user import User
-from schemas.user import CreateUser
+from schemas.user import CreateUser, UpdateUser
 from fastapi import HTTPException, status
 from datetime import datetime
 from core.enums import Role
@@ -46,3 +46,36 @@ def show_all_users(db:Session):
     all_users = db.query(User).filter().all()
 
     return all_users
+
+def update_current_user(data:UpdateUser, user:User, db:Session):
+    if user is None:
+        return
+    
+    update_data = data.model_dump(exclude_unset=True)  # only provided keys
+    
+    for key, value in update_data.items():
+        setattr(user, key, value)
+
+    user.updated_at = datetime.now()
+    
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+def update_user_by_id(id:int, data:UpdateUser, db:Session):
+    user = db.query(User).filter(User.id == id).first()
+    if user is None:
+        return
+    
+    update_data = data.model_dump(exclude_unset=True)  # only provided keys
+    
+    for key, value in update_data.items():
+        setattr(user, key, value)
+
+    user.updated_at = datetime.now()
+    
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user

@@ -29,3 +29,18 @@ class CreateUser(BaseModel):
     password:str
     class Config:
         orm_mode = True
+
+
+class UpdateUser(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    mobile: Optional[str] = None
+    location: Optional[str] = None
+    role: Optional[str] = None
+    avatar: Optional[str] = None
+    company_id:Optional[int] = None
+    is_active:Optional[bool] = None
+
+    class Config():
+        orm_mode = True
