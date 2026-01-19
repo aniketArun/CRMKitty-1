@@ -9,3 +9,4 @@ from .models.invoice import Invoice
 from .models.report import Report
 from .models.role import Role
 from .models.company import Company
+from .models.follow_up import FollowUp
