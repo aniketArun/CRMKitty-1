@@ -38,7 +38,7 @@ def create_invoice(invoice:CreateInvoice, user:User = Depends(get_current_user),
         dependencies=[Depends(require_permission(Permission.INVOICE_READ))]
         )
 def all_invoices(user:User = Depends(get_current_user), db:Session = Depends(get_db)):
-    invoices = get_all_invoices(db=db)
+    invoices = get_all_invoices(user = user, db=db)
 
     if invoices is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Invoices Found!")

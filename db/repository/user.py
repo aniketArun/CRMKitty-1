@@ -38,14 +38,14 @@ def create_new_user(user:CreateUser, db:Session)->User:
         raise ValueError("User creation failed")
 
 
-def show_all_users(db:Session):
+def show_all_users(user:User, db:Session):
     '''
     Docstring for show_all_users
     
     :param db: Description
     :type db: Session
     '''
-    all_users = db.query(User).filter().all()
+    all_users = db.query(User).filter(User.company_id == user.company_id).all()
 
     return all_users
 

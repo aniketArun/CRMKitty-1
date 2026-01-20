@@ -35,8 +35,8 @@ def create_user(user:CreateUser, db:Session=Depends(get_db)):
     status_code=status.HTTP_200_OK, 
     dependencies=[Depends(require_permission(Permission.USER_READ))]
 )
-def show_users(db:Session=Depends(get_db)):
-    users = show_all_users(db=db)
+def show_users(user:User = Depends(get_current_user),db:Session=Depends(get_db)):
+    users = show_all_users(user=user, db=db)
     if users is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No users found!")
     

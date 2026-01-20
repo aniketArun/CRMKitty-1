@@ -29,8 +29,8 @@ router = APIRouter()
         status_code=status.HTTP_200_OK, 
         dependencies=[Depends(require_permission(Permission.CUSTOMER_READ))]
         )
-def all_customers(db:Session = Depends(get_db)):
-    customers = get_all_customers(db=db)
+def all_customers(user:User = Depends(get_current_user), db:Session = Depends(get_db)):
+    customers = get_all_customers(user = user, db=db)
 
     if customers is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")

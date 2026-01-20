@@ -24,7 +24,7 @@ router = APIRouter()
         dependencies=[Depends(require_permission(Permission.LEAD_READ))]
         )
 def show_leads(db:Session=Depends(get_db), user:User = Depends(get_current_user)):
-    leads = show_all_leads(db = db)
+    leads = show_all_leads(user=user, db = db)
 
     if not leads:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No leads Fount!")

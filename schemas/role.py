@@ -11,6 +11,7 @@ class ShowRole(BaseModel):
     updated_by:Optional[int] = None
     created_at:datetime = Field(default_factory= datetime.now)
     updated_at:Optional[datetime] = None
+    company_id:Optional[int] = None
     class Config():
         orm_mode = True
 

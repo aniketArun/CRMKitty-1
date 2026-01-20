@@ -26,8 +26,8 @@ def create_new_invoice(invoice:CreateInvoice, by_user:User, db:Session):
     return new_invoice
 
 
-def get_all_invoices(db:Session):
-    queryset = db.query(Invoice).filter().all()
+def get_all_invoices(user:User, db:Session):
+    queryset = db.query(Invoice).filter(Invoice.company_id == user.company_id).all()
 
     return queryset
 

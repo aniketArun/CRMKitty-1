@@ -26,9 +26,9 @@ def create_new_product(product:CreateProduct, by_user:User, db:Session):
     return new_product
 
 
-def get_all_products(db:Session):
+def get_all_products(user:User, db:Session):
 
-    queryset = db.query(Product).filter().all()
+    queryset = db.query(Product).filter(Product.id == user.company_id).all()
 
     return queryset
 

@@ -23,9 +23,9 @@ def create_new_report(report:CreateReport, db:Session):
 
 
 
-def get_all_report(db:Session):
+def get_all_report(user:User, db:Session):
 
-    queryset = db.query(Report).filter().all()
+    queryset = db.query(Report).filter(Report.company_id == user.company_id).all()
 
     return queryset
 

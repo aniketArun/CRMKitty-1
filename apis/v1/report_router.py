@@ -39,7 +39,7 @@ def create_report(report:CreateReport, db:Session = Depends(get_db)):
         )
 def all_reports(db:Session = Depends(get_db), user:User = Depends(get_current_user)):
 
-    reports = get_all_report(db=db)
+    reports = get_all_report(user=user, db=db)
 
     if reports is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Reports Found!")

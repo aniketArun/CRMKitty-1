@@ -12,4 +12,5 @@ class Role(Base):
     updated_by = Column(Integer, nullable=True)
     created_at = Column(DateTime, default = datetime.now)
     updated_at = Column(DateTime, nullable=True)
+    company_id = Column(Integer, nullable=True)
 

@@ -25,8 +25,8 @@ def create_new_customer(customer:CreateCustomer, by_user:User, db:Session):
     return new_customer
 
 
-def get_all_customers(db:Session):
-    queryset = db.query(Customer).filter().all()
+def get_all_customers(user:User, db:Session):
+    queryset = db.query(Customer).filter(Customer.id == user.company_id).all()
 
     return queryset
 

@@ -6,6 +6,8 @@ from schemas.role import CreateRole, ShowRole
 from services.auth import get_current_user, require_permission
 from fastapi_pagination import paginate, Page
 from core.enums import Permission
+from db.models.user import User
+
 router = APIRouter()
 
 @router.post(
@@ -14,8 +16,8 @@ router = APIRouter()
         status_code=status.HTTP_201_CREATED,
         dependencies=[Depends(require_permission(Permission.ROLE_CREATE))]
         )
-def create_role(role:CreateRole, db:Session = Depends(get_db)):
-    new_role = create_new_role(role=role, db=db)
+def create_role(role:CreateRole, user:User = Depends(get_current_user), db:Session = Depends(get_db)):
+    new_role = create_new_role(user=user, role=role, db=db)
 
     if new_role is None:
         raise HTTPException(detail="Not able to create new role!", status_code=status.HTTP_406_NOT_ACCEPTABLE)

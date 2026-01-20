@@ -23,7 +23,7 @@ router = APIRouter()
         dependencies=[Depends(require_permission(Permission.PRODUCT_READ))]
         )
 def all_products(db:Session = Depends(get_db), user:User = Depends(get_current_user), ):
-    products = get_all_products(db=db)
+    products = get_all_products(user=user, db=db)
 
     if products is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Product have been created!")
