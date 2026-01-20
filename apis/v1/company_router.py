@@ -3,9 +3,9 @@ from db.session import get_db
 from sqlalchemy.orm import Session
 from schemas.company import CreateCompany, ShowCompany, UpdateCompany
 from db.models.user import User
-from services.auth import get_current_user
+from services.auth import get_current_user, require_permission
 from db.repository.company import get_all_companies, create_new_company, update_company_by_id
-
+from core.enums import Permission
 
 router = APIRouter()
 
@@ -26,7 +26,12 @@ def create_company(cp:CreateCompany, db:Session = Depends(get_db)):
     return new_cp
 
 
-@router.patch("/<id:int>", response_model=ShowCompany, status_code=status.HTTP_202_ACCEPTED)
+@router.patch(
+        "/<id:int>", 
+        response_model=ShowCompany, 
+        status_code=status.HTTP_202_ACCEPTED, 
+        dependencies=[Depends(require_permission(Permission.SITE_SETTINGS))]
+        )
 def update_company_id(
         id:int, 
         data:UpdateCompany, 

@@ -4,8 +4,8 @@ from db.session import get_db
 from typing import List
 from fastapi_pagination import Page, add_pagination, paginate
 from db.models.user import User
-from services.auth import get_current_user
-
+from services.auth import get_current_user, require_permission
+from core.enums import Permission
 from db.repository.customer import (
     create_new_customer,
     get_all_customers,
@@ -23,7 +23,12 @@ from schemas.customer import (
 
 router = APIRouter()
 
-@router.get("/", response_model=Page[ShowCustomer], status_code=status.HTTP_200_OK)
+@router.get(
+        "/", 
+        response_model=Page[ShowCustomer], 
+        status_code=status.HTTP_200_OK, 
+        dependencies=[Depends(require_permission(Permission.CUSTOMER_READ))]
+        )
 def all_customers(db:Session = Depends(get_db)):
     customers = get_all_customers(db=db)
 
@@ -31,7 +36,12 @@ def all_customers(db:Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")
     return paginate(customers)
 
-@router.post("/", response_model=CreateCustomer, status_code=status.HTTP_201_CREATED)
+@router.post(
+        "/", 
+        response_model=CreateCustomer, 
+        status_code=status.HTTP_201_CREATED,
+        dependencies=[Depends(require_permission(Permission.CUSTOMER_CREATE))]
+        )
 def create_customer(customer:CreateCustomer, db:Session = Depends(get_db), user:User = Depends(get_current_user)):
     new_customer = create_new_customer(customer=customer, db=db, by_user = user)
 
@@ -39,7 +49,12 @@ def create_customer(customer:CreateCustomer, db:Session = Depends(get_db), user:
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Not able to create Customer!")
     return new_customer
 
-@router.get("/<id:int>", response_model=ShowCustomer, status_code=status.HTTP_200_OK)
+@router.get(
+        "/<id:int>", 
+        response_model=ShowCustomer, 
+        status_code=status.HTTP_200_OK,
+        dependencies=[Depends(require_permission(Permission.CUSTOMER_READ))]
+        )
 def get_customer(id:int, user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     customer = get_customer_by_id(id= id, db=db)
 
@@ -47,7 +62,12 @@ def get_customer(id:int, user:User = Depends(get_current_user), db:Session = Dep
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customer Found, Create One!")
     return customer
 
-@router.put("/<id:int>", response_model=ShowCustomer, status_code=status.HTTP_202_ACCEPTED)
+@router.put(
+        "/<id:int>", 
+        response_model=ShowCustomer, 
+        status_code=status.HTTP_202_ACCEPTED,
+        dependencies=[Depends(require_permission(Permission.CUSTOMER_UPDATE))]
+        )
 def update_customer(id:int, data:UpdateCustomer, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     cust_updated = update_cust_by_id(id=id, data=data, by_user=by_user, db=db)
 
@@ -55,7 +75,7 @@ def update_customer(id:int, data:UpdateCustomer, by_user:User = Depends(get_curr
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")
     return cust_updated
 
-@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED)
+@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.CUSTOMER_DELETE))])
 def delete_customer(id:int, user:User=Depends(get_current_user), db:Session =Depends(get_db)):
     transaction = delete_cust_by_id(id=id, db=db)
     if transaction:

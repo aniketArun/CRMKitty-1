@@ -5,13 +5,14 @@ from sqlalchemy.orm import Session
 from schemas.role import CreateRole, ShowRole
 from services.auth import get_current_user, require_permission
 from fastapi_pagination import paginate, Page
+from core.enums import Permission
 router = APIRouter()
 
 @router.post(
         "/", 
         response_model=ShowRole, 
         status_code=status.HTTP_201_CREATED,
-        dependencies=[Depends(require_permission("role:create"))]
+        dependencies=[Depends(require_permission(Permission.ROLE_CREATE))]
         )
 def create_role(role:CreateRole, db:Session = Depends(get_db)):
     new_role = create_new_role(role=role, db=db)
@@ -27,7 +28,7 @@ def create_role(role:CreateRole, db:Session = Depends(get_db)):
         status_code=status.HTTP_200_OK,
         response_model=ShowRole, 
         status_code=status.HTTP_201_CREATED,
-        dependencies=[Depends(require_permission("role:read"))]
+        dependencies=[Depends(require_permission(Permission.ROLE_READ))]
         )
 def get_role(db:Session = Depends(get_db)):
     all_roles = get_all_role(db=db)

@@ -9,6 +9,7 @@ from db.repository.user import (
     update_user_by_id
     )
 from db.session import get_db
+from core.enums import Permission
 from typing import List
 from services.auth import get_current_user, require_permission
 
@@ -18,7 +19,7 @@ router = APIRouter()
     "/", 
     response_model=ShowUser, 
     status_code=status.HTTP_201_CREATED, 
-    dependencies=[Depends(require_permission("user:create"))]
+    dependencies=[Depends(require_permission(Permission.USER_CREATE))]
     )
 def create_user(user:CreateUser, db:Session=Depends(get_db)):
     try:
@@ -32,7 +33,7 @@ def create_user(user:CreateUser, db:Session=Depends(get_db)):
     "/", 
     response_model=List[ShowUser], 
     status_code=status.HTTP_200_OK, 
-    dependencies=[Depends(require_permission("user:read"))]
+    dependencies=[Depends(require_permission(Permission.USER_READ))]
 )
 def show_users(db:Session=Depends(get_db)):
     users = show_all_users(db=db)
@@ -53,7 +54,7 @@ def update_my_profile(user:UpdateUser, by_user:User = Depends(get_current_user),
         "/<id:int>", 
         response_model=ShowUser, 
         status_code=status.HTTP_202_ACCEPTED, 
-        dependencies=[Depends(require_permission("user:update"))]
+        dependencies=[Depends(require_permission(Permission.USER_UPDATE))]
         )
 def update_user(id:int, user:UpdateUser, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     updated_user = update_user_by_id(id=id, data=user, db=db)

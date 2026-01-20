@@ -1,17 +1,28 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Response
 from schemas.lead import CreateLead,ShowLead, UpdateLead
 from sqlalchemy.orm import Session
-from db.repository.leads import create_new_lead, show_all_leads, update_lead_by_id, get_lead_by_id, delete_lead_by_id
+from db.repository.leads import (
+    create_new_lead, 
+    show_all_leads, 
+    update_lead_by_id, 
+    get_lead_by_id, 
+    delete_lead_by_id
+    )
 from db.session import get_db
 from typing import List
-from services.auth import get_current_user
+from services.auth import get_current_user, require_permission
 from db.models.user import User
 from fastapi_pagination import Page, add_pagination, paginate
-
+from core.enums import Permission
 
 router = APIRouter()
 
-@router.get("/", response_model=Page[ShowLead], status_code=status.HTTP_200_OK)
+@router.get(
+        "/", 
+        response_model=Page[ShowLead], 
+        status_code=status.HTTP_200_OK,
+        dependencies=[Depends(require_permission(Permission.LEAD_READ))]
+        )
 def show_leads(db:Session=Depends(get_db), user:User = Depends(get_current_user)):
     leads = show_all_leads(db = db)
 
@@ -20,7 +31,12 @@ def show_leads(db:Session=Depends(get_db), user:User = Depends(get_current_user)
     return paginate(leads)
 
 
-@router.post("/", response_model=ShowLead, status_code=status.HTTP_201_CREATED)
+@router.post(
+        "/", 
+        response_model=ShowLead, 
+        status_code=status.HTTP_201_CREATED,
+        dependencies=[Depends(require_permission(Permission.LEAD_CREATE))]
+        )
 def create_lead(lead:CreateLead, db:Session=Depends(get_db), user:User = Depends(get_current_user)):
     new_lead = create_new_lead(lead=lead, db = db, created_by_user= user)
     if new_lead is not None:
@@ -29,7 +45,7 @@ def create_lead(lead:CreateLead, db:Session=Depends(get_db), user:User = Depends
 
 
 
-@router.patch("/<id:int>", response_model=ShowLead, status_code=status.HTTP_202_ACCEPTED)
+@router.patch("/<id:int>", response_model=ShowLead, status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.LEAD_UPDATE))])
 def update_lead(
     id:int, 
     data:UpdateLead, 
@@ -42,7 +58,7 @@ def update_lead(
     return db_lead
 
 
-@router.get("/<id:int>", response_model=ShowLead, status_code=status.HTTP_202_ACCEPTED)
+@router.get("/<id:int>", response_model=ShowLead, status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.LEAD_READ))])
 def get_lead(
     id:int, 
     db:Session = Depends(get_db), 
@@ -54,7 +70,7 @@ def get_lead(
     return db_lead
 
 
-@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED)
+@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.LEAD_DELETE))])
 def delete_lead(
     id:int, 
     db:Session = Depends(get_db), 

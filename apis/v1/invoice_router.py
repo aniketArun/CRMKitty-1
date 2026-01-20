@@ -11,11 +11,18 @@ from db.repository.invoice import (
 )
 from typing import List
 from fastapi_pagination import Page, paginate
-from services.auth import get_current_user
+from services.auth import get_current_user, require_permission
 from db.models.user import User
+from core.enums import Permission
+
 router = APIRouter()
 
-@router.post("/", response_model=ShowInvoice, status_code=status.HTTP_201_CREATED)
+@router.post(
+        "/", 
+        response_model=ShowInvoice, 
+        status_code=status.HTTP_201_CREATED,
+        dependencies=[Depends(require_permission(Permission.INVOICE_CREATE))]
+        )
 def create_invoice(invoice:CreateInvoice, user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     new_invoice = create_new_invoice(invoice=invoice, db=db, by_user = user)
 
@@ -24,7 +31,12 @@ def create_invoice(invoice:CreateInvoice, user:User = Depends(get_current_user),
     return new_invoice
 
 
-@router.get("/", response_model=Page[ShowInvoice], status_code=status.HTTP_200_OK)
+@router.get(
+        "/", 
+        response_model=Page[ShowInvoice], 
+        status_code=status.HTTP_200_OK,
+        dependencies=[Depends(require_permission(Permission.INVOICE_READ))]
+        )
 def all_invoices(user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     invoices = get_all_invoices(db=db)
 
@@ -33,7 +45,12 @@ def all_invoices(user:User = Depends(get_current_user), db:Session = Depends(get
     return paginate(invoices)
 
 
-@router.get("/<id:int>", response_model=ShowInvoice, status_code=status.HTTP_200_OK)
+@router.get(
+        "/<id:int>", 
+        response_model=ShowInvoice, 
+        status_code=status.HTTP_200_OK,
+        dependencies=[Depends(require_permission(Permission.INVOICE_READ))]
+        )
 def get_invoice(id:int, user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     invoice = get_invoice_by_id(id=id, db=db)
 
@@ -41,7 +58,12 @@ def get_invoice(id:int, user:User = Depends(get_current_user), db:Session = Depe
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No Invoice Found! with id {id}")
     return paginate(invoice)
 
-@router.put("/<id:int>",response_model=ShowInvoice, status_code=status.HTTP_202_ACCEPTED)
+@router.put(
+        "/<id:int>",
+        response_model=ShowInvoice, 
+        status_code=status.HTTP_202_ACCEPTED,
+        dependencies=[Depends(require_permission(Permission.INVOICE_UPDATE))]
+        )
 def update_invoice(id:int, data:UpdateInvoice, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     invoice_updated = update_invoice_by_id(id=id, data=data, by_user=by_user, db=db)
 
@@ -50,7 +72,7 @@ def update_invoice(id:int, data:UpdateInvoice, by_user:User = Depends(get_curren
     return invoice_updated
 
 
-@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED)
+@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.INVOICE_DELETE))])
 def delete_invoice(id:int, by_user: User = Depends(get_current_user), db:Session = Depends(get_db)):
     invoice_deleted = delete_invoice_by_id(id=id, db=db)
 
