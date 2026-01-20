@@ -9,7 +9,7 @@ class ShowUser(BaseModel):
     email: Optional[EmailStr] = None
     mobile: Optional[str] = None
     location: Optional[str] = None
-    role: Optional[str] = None
+    role_id: Optional[int] = None
     avatar: Optional[str] = None
     company_id:Optional[int] = None
     is_active:bool
@@ -24,7 +24,7 @@ class CreateUser(BaseModel):
     email: Optional[EmailStr]=None
     mobile: Optional[str] = Field(None, pattern=r"^\+?\d{10,15}$")
     location: Optional[str]=None
-    role: Optional[str]=None
+    role: Optional[int]=None
     avatar: Optional[str]=None
     password:str
     class Config:
@@ -37,7 +37,7 @@ class UpdateUser(BaseModel):
     email: Optional[EmailStr] = None
     mobile: Optional[str] = None
     location: Optional[str] = None
-    role: Optional[str] = None
+    role_id: Optional[int] = None
     avatar: Optional[str] = None
     company_id:Optional[int] = None
     is_active:Optional[bool] = None

@@ -1,6 +1,7 @@
 from core.hashing import Hasher
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from db.models.role import Role
 from db.repository.login import get_user_by_email
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
@@ -49,3 +50,21 @@ def create_access_token(data:dict):
     encoded_jwt = jwt.encode(to_encode,settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
     return encoded_jwt
+
+
+def require_permission(permission: str):
+    async def dependency(user = Depends(get_current_user)):
+        # user.role is a single Role object
+        if not user.role or not user.role.permissions:
+            raise HTTPException(
+                status_code=403,
+                detail="No role or permissions assigned"
+            )
+
+        if permission not in user.role.permissions:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Permission '{permission}' required"
+            )
+    return dependency
+

@@ -1,9 +1,9 @@
 from db.base_class import Base
-from core.enums import Role
+# from core.enums import Role
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DateTime
-from sqlalchemy.orm import Relationship
+from sqlalchemy.orm import relationship
 from datetime import datetime
-
+from db.models.role import Role
 
 class User(Base):
     id = Column(Integer, primary_key=True)
@@ -12,8 +12,8 @@ class User(Base):
     email = Column(String, nullable=False)
     mobile = Column(String, nullable=True)
     location = Column(String, nullable=True)
-    role = Column(String, nullable=False, default=Role.LEAD_MANAGER.name)
-    plan_id = Column(Integer, nullable=True)
+    role_id = Column(Integer, ForeignKey("role.id"), nullable=False) 
+    role = relationship("Role", backref="users") # <-- link to Role
     avatar = Column(String, nullable=True)
     two_factor_auth = Column(Boolean, nullable=True)
     created_at = Column(DateTime, default=datetime.now)

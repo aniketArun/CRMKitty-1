@@ -10,11 +10,16 @@ from db.repository.user import (
     )
 from db.session import get_db
 from typing import List
-from services.auth import get_current_user
+from services.auth import get_current_user, require_permission
 
 router = APIRouter()
 
-@router.post("/", response_model=ShowUser, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/", 
+    response_model=ShowUser, 
+    status_code=status.HTTP_201_CREATED, 
+    dependencies=[Depends(require_permission("user:create"))]
+    )
 def create_user(user:CreateUser, db:Session=Depends(get_db)):
     new_user = create_new_user(user=user, db = db)
     if new_user is None:

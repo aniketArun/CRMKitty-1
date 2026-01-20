@@ -22,7 +22,7 @@ def create_new_user(user:CreateUser, db:Session):
         email=user.email, 
         mobile=user.mobile, 
         location=user.location, 
-        role=user.role if user.role else Role.LEAD_MANAGER.name, 
+        role_id=user.role if user.role else Role.LEAD_MANAGER.value, 
         avatar=user.avatar, 
         created_at=datetime.now(), 
         password = Hasher.get_password_hashed(password=user.password),
