@@ -52,7 +52,7 @@ def impersonate_user(
     # Create token with impersonation flag
     access_token = create_access_token(
         data={
-            "sub": str(target_user.id),          # subject is user ID now
+            "sub": str(target_user.email),          # subject is user ID now
             "impersonated_by": str(current_user.id)
         }
     )

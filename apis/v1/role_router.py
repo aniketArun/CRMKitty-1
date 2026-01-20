@@ -26,8 +26,6 @@ def create_role(role:CreateRole, db:Session = Depends(get_db)):
         "/", 
         response_model=Page[ShowRole], 
         status_code=status.HTTP_200_OK,
-        response_model=ShowRole, 
-        status_code=status.HTTP_201_CREATED,
         dependencies=[Depends(require_permission(Permission.ROLE_READ))]
         )
 def get_role(db:Session = Depends(get_db)):
