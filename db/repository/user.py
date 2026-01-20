@@ -49,6 +49,11 @@ def show_all_users(db:Session):
 
     return all_users
 
+
+def get_user_by_id(id:int, db:Session):
+    user = db.query(User).filter(User.id == id).first()
+    return user
+
 def update_current_user(data:UpdateUser, user:User, db:Session):
     if user is None:
         return
