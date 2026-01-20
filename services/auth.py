@@ -1,7 +1,7 @@
 from core.hashing import Hasher
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from db.models.role import Role
+from core.enums import Role
 from db.repository.login import get_user_by_email
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
@@ -60,6 +60,10 @@ def require_permission(permission: str):
                 status_code=403,
                 detail="No role or permissions assigned"
             )
+      
+        # Grant full access if role is admin 
+        if user.role.name == Role.ADMIN.value:
+            return
 
         if permission not in user.role.permissions:
             raise HTTPException(

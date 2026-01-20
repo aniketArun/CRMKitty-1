@@ -3,11 +3,16 @@ from db.repository.role import create_new_role, get_all_role
 from db.session import get_db
 from sqlalchemy.orm import Session
 from schemas.role import CreateRole, ShowRole
-from typing import List
-
+from services.auth import get_current_user, require_permission
+from fastapi_pagination import paginate, Page
 router = APIRouter()
 
-@router.post("/", response_model=ShowRole, status_code=status.HTTP_201_CREATED)
+@router.post(
+        "/", 
+        response_model=ShowRole, 
+        status_code=status.HTTP_201_CREATED,
+        dependencies=[Depends(require_permission("role:create"))]
+        )
 def create_role(role:CreateRole, db:Session = Depends(get_db)):
     new_role = create_new_role(role=role, db=db)
 
@@ -16,12 +21,19 @@ def create_role(role:CreateRole, db:Session = Depends(get_db)):
     
     return new_role
 
-@router.get("/", response_model=List[ShowRole], status_code=status.HTTP_200_OK)
-def create_role(db:Session = Depends(get_db)):
+@router.get(
+        "/", 
+        response_model=Page[ShowRole], 
+        status_code=status.HTTP_200_OK,
+        response_model=ShowRole, 
+        status_code=status.HTTP_201_CREATED,
+        dependencies=[Depends(require_permission("role:read"))]
+        )
+def get_role(db:Session = Depends(get_db)):
     all_roles = get_all_role(db=db)
 
     if all_roles is None:
         raise HTTPException(detail="No role have been created!", status_code=status.HTTP_404_NOT_FOUND)
     
-    return all_roles
+    return paginate(all_roles)
 
