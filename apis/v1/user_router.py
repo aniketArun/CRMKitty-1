@@ -21,11 +21,12 @@ router = APIRouter()
     dependencies=[Depends(require_permission("user:create"))]
     )
 def create_user(user:CreateUser, db:Session=Depends(get_db)):
-    new_user = create_new_user(user=user, db = db)
-    if new_user is None:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Not able to create User")
+    try:
+        new_user = create_new_user(user=user, db = db)
+        return new_user
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
-    return new_user
 
 
 @router.get("/", response_model=List[ShowUser], status_code=status.HTTP_200_OK)

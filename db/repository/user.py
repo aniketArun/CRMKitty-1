@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from db.models.user import User
 from schemas.user import CreateUser, UpdateUser
 from fastapi import HTTPException, status
@@ -6,7 +7,7 @@ from datetime import datetime
 from core.enums import Role
 from core.hashing import Hasher
 
-def create_new_user(user:CreateUser, db:Session):
+def create_new_user(user:CreateUser, db:Session)->User:
     '''
     Docstring for create_new_user
     
@@ -15,25 +16,26 @@ def create_new_user(user:CreateUser, db:Session):
     :param db: Description
     :type db: Session
     '''
-
-    new_user = User(
-        first_name=user.first_name, 
-        last_name=user.last_name, 
-        email=user.email, 
-        mobile=user.mobile, 
-        location=user.location, 
-        role_id=user.role if user.role else Role.LEAD_MANAGER.value, 
-        avatar=user.avatar, 
-        created_at=datetime.now(), 
-        password = Hasher.get_password_hashed(password=user.password),
-        is_active=True 
-    )
+    try:
+        new_user = User(
+            first_name=user.first_name, 
+            last_name=user.last_name, 
+            email=user.email, 
+            mobile=user.mobile, 
+            location=user.location, 
+            role_id=user.role if user.role else Role.LEAD_MANAGER.value, 
+            avatar=user.avatar, 
+            created_at=datetime.now(), 
+            password = Hasher.get_password_hashed(password=user.password),
+            is_active=True 
+        )
     
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
-    
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        return new_user
+    except IntegrityError: 
+        raise ValueError("User creation failed")
 
 
 def show_all_users(db:Session):
