@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, status, HTTPException
-from db.repository.role import create_new_role, get_all_role
+from db.repository.role import create_new_role, get_all_role, update_role_by_id
 from db.session import get_db
 from sqlalchemy.orm import Session
-from schemas.role import CreateRole, ShowRole
+from schemas.role import CreateRole, ShowRole, UpdateRole
 from services.auth import get_current_user, require_permission
 from fastapi_pagination import paginate, Page
 from core.enums import Permission
@@ -30,11 +30,26 @@ def create_role(role:CreateRole, user:User = Depends(get_current_user), db:Sessi
         status_code=status.HTTP_200_OK,
         dependencies=[Depends(require_permission(Permission.ROLE_READ))]
         )
-def get_role(db:Session = Depends(get_db)):
-    all_roles = get_all_role(db=db)
+def get_role(by_user:User = Depends(get_current_user),db:Session = Depends(get_db)):
+    all_roles = get_all_role(user=by_user, db=db)
 
     if all_roles is None:
         raise HTTPException(detail="No role have been created!", status_code=status.HTTP_404_NOT_FOUND)
     
     return paginate(all_roles)
+
+
+@router.put("/<id:int>", response_model=ShowRole, status_code=status.HTTP_200_OK)
+def update_role(id:int, role:UpdateRole, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
+    role_updated = update_role_by_id(
+        id=id,
+        role=role,
+        by_user=by_user,
+        db=db
+        )
+    
+    if role_updated is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Role Updated failed!")
+    return role_updated
+
 

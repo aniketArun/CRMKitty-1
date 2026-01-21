@@ -26,3 +26,13 @@ class CreateRole(BaseModel):
     updated_at:Optional[datetime] = None
     class Config():
         orm_mode = True
+
+class UpdateRole(BaseModel):
+    name:Optional[str] = None
+    permissions:Optional[List[str]] = Field(default_factory=list)
+    description:Optional[str] = None
+    created_by:Optional[int] = None
+    updated_by:Optional[int] = None
+    updated_at:Optional[datetime] = None
+    class Config():
+        orm_mode = True
