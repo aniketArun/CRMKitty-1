@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, Any
-
+from schemas.role import ShowRole
 
 class ShowUser(BaseModel):
     id: int
@@ -13,6 +13,7 @@ class ShowUser(BaseModel):
     avatar: Optional[str] = None
     company_id:Optional[int] = None
     is_active:bool
+    role:Optional[ShowRole] = None
     created_at:Any
     updated_at:Optional[Any] = None
     class Config:

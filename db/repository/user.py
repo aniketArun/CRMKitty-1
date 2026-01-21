@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from db.models.user import User
 from schemas.user import CreateUser, UpdateUser
@@ -51,7 +51,7 @@ def show_all_users(user:User, db:Session):
 
 
 def get_user_by_id(id:int, db:Session):
-    user = db.query(User).filter(User.id == id).first()
+    user = db.query(User).options(joinedload(User.role)).filter(User.id == id).first()
     return user
 
 def update_current_user(data:UpdateUser, user:User, db:Session):
