@@ -23,7 +23,7 @@ def create_new_user(user:CreateUser, db:Session)->User:
             email=user.email, 
             mobile=user.mobile, 
             location=user.location, 
-            role_id=user.role if user.role else Role.LEAD_MANAGER.value, 
+            role_id=user.role, 
             avatar=user.avatar, 
             created_at=datetime.now(), 
             password = Hasher.get_password_hashed(password=user.password),
@@ -86,3 +86,14 @@ def update_user_by_id(id:int, data:UpdateUser, db:Session):
     db.commit()
     db.refresh(user)
     return user
+
+def delete_user_by_id(id:int, data:UpdateUser, db:Session):
+    user = db.query(User).filter(User.id == id).first()
+    if user is None:
+        return False
+    
+    db.delete(user)
+    
+    db.add(user)
+    db.commit()
+    return True

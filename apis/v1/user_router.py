@@ -7,7 +7,8 @@ from db.repository.user import (
     show_all_users,
     update_current_user,
     update_user_by_id, 
-    get_user_by_id
+    get_user_by_id,
+    delete_user_by_id
     )
 from db.session import get_db
 from core.enums import Permission
@@ -52,7 +53,7 @@ def update_my_profile(user:UpdateUser, by_user:User = Depends(get_current_user),
     return updated_user
 
 @router.put(
-        "/<id:int>", 
+        "/{id}", 
         response_model=ShowUser, 
         status_code=status.HTTP_202_ACCEPTED, 
         dependencies=[Depends(require_permission(Permission.USER_UPDATE))]
@@ -64,9 +65,16 @@ def update_user(id:int, user:UpdateUser, by_user:User = Depends(get_current_user
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Updated failed")
     return updated_user
 
-@router.get("/<id:int>", response_model=ShowUser, status_code=status.HTTP_200_OK)
+@router.get("/{id}", response_model=ShowUser, status_code=status.HTTP_200_OK)
 def get_user(id:int, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     user_in_db = get_user_by_id(id=id, db=db)
     if user_in_db is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No user Found!")
     return user_in_db
+
+@router.delete("/{id}", status_code=status.HTTP_200_OK)
+def get_user(id:int, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
+    user_in_db = delete_user_by_id(id=id, db=db)
+    if not user_in_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No user Found!")
+    return {"message":"user deleted !"}
