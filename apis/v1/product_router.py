@@ -13,6 +13,7 @@ from typing import List
 from db.models.user import User
 from services.auth import get_current_user, require_permission
 from core.enums import Permission
+import json
 
 router = APIRouter()
 
@@ -45,7 +46,7 @@ def create_product(product:CreateProduct, db:Session = Depends(get_db), by_user:
     return new_product
 
 @router.get(
-        "/<id:int>", 
+        "/{id}", 
         response_model=ShowProduct, 
         status_code=status.HTTP_200_OK,
         dependencies=[Depends(require_permission(Permission.PRODUCT_READ))]
@@ -58,7 +59,7 @@ def get_product(id:int, user:User = Depends(get_current_user), db:Session = Depe
     return product
 
 @router.put(
-        "/<id:int>", 
+        "/{id}", 
         response_model=ShowProduct, 
         status_code=status.HTTP_202_ACCEPTED,
         dependencies=[Depends(require_permission(Permission.PRODUCT_UPDATE))]
@@ -71,10 +72,14 @@ def update_product(id:int, data:UpdateProduct, by_user:User = Depends(get_curren
     return product_to_update
 
 
-@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.PRODUCT_DELETE))])
+@router.delete("/{id}", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.PRODUCT_DELETE))])
 def delete_product(id:int, user:User=Depends(get_current_user), db:Session=Depends(get_db)):
     transaction = delete_product_by_id(id=id, db=db)
     if transaction:
-        return Response({"Message":"Product Deleted!"}, status_code=status.HTTP_202_ACCEPTED)
+        return Response(
+            content=json.dumps({"Message":"Product Deleted!"}), 
+            status_code=status.HTTP_202_ACCEPTED,
+            media_type="application/json"
+            )
     
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Product Found, Create One!")
