@@ -53,7 +53,7 @@ def update_report_by_id(id:int, data:UpdateReport, by_user:User, db:Session):
     db.refresh(rp_in_db)
     return rp_in_db
 
-def delete_report_by_id(id:int, db:Session):
+def delete_report_by_id(id:int, by_user:User, db:Session):
     rp_in_db = db.query(Report).filter(Report.id == id).first()
     if not rp_in_db:
         return False

@@ -1,5 +1,5 @@
 from db.session import get_db
-from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi import APIRouter, status, HTTPException, Depends, Response
 from schemas.invoice import CreateInvoice, ShowInvoice, UpdateInvoice
 from sqlalchemy.orm import Session
 from db.repository.invoice import (
@@ -14,6 +14,7 @@ from fastapi_pagination import Page, paginate
 from services.auth import get_current_user, require_permission
 from db.models.user import User
 from core.enums import Permission
+import json
 
 router = APIRouter()
 
@@ -46,7 +47,7 @@ def all_invoices(user:User = Depends(get_current_user), db:Session = Depends(get
 
 
 @router.get(
-        "/<id:int>", 
+        "/{id}", 
         response_model=ShowInvoice, 
         status_code=status.HTTP_200_OK,
         dependencies=[Depends(require_permission(Permission.INVOICE_READ))]
@@ -59,7 +60,7 @@ def get_invoice(id:int, user:User = Depends(get_current_user), db:Session = Depe
     return paginate(invoice)
 
 @router.put(
-        "/<id:int>",
+        "/{id}",
         response_model=ShowInvoice, 
         status_code=status.HTTP_202_ACCEPTED,
         dependencies=[Depends(require_permission(Permission.INVOICE_UPDATE))]
@@ -72,10 +73,10 @@ def update_invoice(id:int, data:UpdateInvoice, by_user:User = Depends(get_curren
     return invoice_updated
 
 
-@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.INVOICE_DELETE))])
+@router.delete("/{id}", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.INVOICE_DELETE))])
 def delete_invoice(id:int, by_user: User = Depends(get_current_user), db:Session = Depends(get_db)):
     invoice_deleted = delete_invoice_by_id(id=id, db=db)
 
     if invoice_deleted:
-        return {"Mesaage":"invoice deleted!"}
+        return Response(content=json.dumps({"Mesaage":"invoice deleted!"}), status_code=status.HTTP_200_OK, media_type="application/json")
     raise HTTPException(detail="No Invoice Found or Something went Wrong", status_code=status.HTTP_404_NOT_FOUND)
