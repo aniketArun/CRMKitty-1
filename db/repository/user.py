@@ -87,7 +87,7 @@ def update_user_by_id(id:int, data:UpdateUser, db:Session):
     db.refresh(user)
     return user
 
-def delete_user_by_id(id:int, data:UpdateUser, db:Session):
+def delete_user_by_id(id:int, db:Session):
     user = db.query(User).filter(User.id == id).first()
     if user is None:
         return False

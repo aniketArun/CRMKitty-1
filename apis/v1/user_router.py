@@ -72,8 +72,12 @@ def get_user(id:int, by_user:User = Depends(get_current_user), db:Session = Depe
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No user Found!")
     return user_in_db
 
-@router.delete("/{id}", status_code=status.HTTP_200_OK)
-def get_user(id:int, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
+@router.delete(
+        "/{id}", 
+        status_code=status.HTTP_200_OK,
+        dependencies=[Depends(require_permission(Permission.USER_DELETE))]
+        )
+def delete_user(id:int, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     user_in_db = delete_user_by_id(id=id, db=db)
     if not user_in_db:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No user Found!")

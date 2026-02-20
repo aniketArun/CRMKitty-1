@@ -43,3 +43,22 @@ def test_get_user_by_id(user_id_, auth_headers):
     assert response.status_code == 200
     print(response.json())
     assert response.json()['id'] == user_id_
+
+def test_put_user_by_id(user_id_, auth_headers):
+    url:str = f"{base_url}/users/{user_id_}"
+
+    data = {
+        "first_name" : "Sanket"
+    }
+
+    response = requests.put(url=url, json=data, headers=auth_headers)
+
+    assert response.status_code == 202
+    assert response.json()['first_name'] == data['first_name']
+
+def test_delete_user_by_id(user_id_, auth_headers):
+    url:str = f"{base_url}/users/{user_id_}"
+
+    response = requests.delete(url=url, headers=auth_headers)
+
+    assert response.status_code == 200
