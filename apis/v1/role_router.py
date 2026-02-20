@@ -39,7 +39,7 @@ def get_role(by_user:User = Depends(get_current_user),db:Session = Depends(get_d
     return paginate(all_roles)
 
 
-@router.put("/<id:int>", response_model=ShowRole, status_code=status.HTTP_200_OK)
+@router.put("/{id}", response_model=ShowRole, status_code=status.HTTP_200_OK)
 def update_role(id:int, role:UpdateRole, by_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
     role_updated = update_role_by_id(
         id=id,

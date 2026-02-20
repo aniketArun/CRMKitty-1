@@ -4,3 +4,4 @@ test.db
 .env.local
 alembic/__pycache__
 alembic/versions
+.pytest_cache/
