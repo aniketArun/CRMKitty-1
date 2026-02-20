@@ -59,7 +59,7 @@ def update_lead_by_id(id:int, lead: UpdateLead, db: Session, by_user:User):
 
 def show_all_leads(user:User, db:Session):
 
-    all_leads = db.query(Lead).filter(Lead.company == user.company_id).all()
+    all_leads = db.query(Lead).filter(Lead.owned_by == user.company_id).all()
 
     return all_leads
 

@@ -14,6 +14,7 @@ from services.auth import get_current_user, require_permission
 from db.models.user import User
 from fastapi_pagination import Page, add_pagination, paginate
 from core.enums import Permission
+import json
 
 router = APIRouter()
 
@@ -45,7 +46,7 @@ def create_lead(lead:CreateLead, db:Session=Depends(get_db), user:User = Depends
 
 
 
-@router.patch("/<id:int>", response_model=ShowLead, status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.LEAD_UPDATE))])
+@router.patch("/{id}", response_model=ShowLead, status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.LEAD_UPDATE))])
 def update_lead(
     id:int, 
     data:UpdateLead, 
@@ -58,7 +59,7 @@ def update_lead(
     return db_lead
 
 
-@router.get("/<id:int>", response_model=ShowLead, status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.LEAD_READ))])
+@router.get("/{id}", response_model=ShowLead, status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.LEAD_READ))])
 def get_lead(
     id:int, 
     db:Session = Depends(get_db), 
@@ -70,7 +71,7 @@ def get_lead(
     return db_lead
 
 
-@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.LEAD_DELETE))])
+@router.delete("/{id}", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.LEAD_DELETE))])
 def delete_lead(
     id:int, 
     db:Session = Depends(get_db), 
@@ -79,4 +80,8 @@ def delete_lead(
     db_lead = delete_lead_by_id(id=id, db=db)
     if db_lead is False:
         raise HTTPException(detail=f"No lead fount with id {id}", status_code=status.HTTP_404_NOT_FOUND)
-    return Response({"Message":"Lead Deleted succesfully !"}, status_code=status.HTTP_202_ACCEPTED)
+    return Response( 
+        content=json.dumps({"Message": "Lead Deleted successfully!"}), 
+        status_code=status.HTTP_202_ACCEPTED, 
+        media_type="application/json" 
+        )
