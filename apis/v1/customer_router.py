@@ -13,6 +13,7 @@ from db.repository.customer import (
     update_cust_by_id,
     delete_cust_by_id,
 )
+import json
 
 from schemas.customer import (
     CreateCustomer, 
@@ -38,7 +39,7 @@ def all_customers(user:User = Depends(get_current_user), db:Session = Depends(ge
 
 @router.post(
         "/", 
-        response_model=CreateCustomer, 
+        response_model=ShowCustomer, 
         status_code=status.HTTP_201_CREATED,
         dependencies=[Depends(require_permission(Permission.CUSTOMER_CREATE))]
         )
@@ -50,7 +51,7 @@ def create_customer(customer:CreateCustomer, db:Session = Depends(get_db), user:
     return new_customer
 
 @router.get(
-        "/<id:int>", 
+        "/{id}", 
         response_model=ShowCustomer, 
         status_code=status.HTTP_200_OK,
         dependencies=[Depends(require_permission(Permission.CUSTOMER_READ))]
@@ -63,7 +64,7 @@ def get_customer(id:int, user:User = Depends(get_current_user), db:Session = Dep
     return customer
 
 @router.put(
-        "/<id:int>", 
+        "/{id}", 
         response_model=ShowCustomer, 
         status_code=status.HTTP_202_ACCEPTED,
         dependencies=[Depends(require_permission(Permission.CUSTOMER_UPDATE))]
@@ -75,10 +76,14 @@ def update_customer(id:int, data:UpdateCustomer, by_user:User = Depends(get_curr
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")
     return cust_updated
 
-@router.delete("/<id:int>", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.CUSTOMER_DELETE))])
+@router.delete("/{id}", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.CUSTOMER_DELETE))])
 def delete_customer(id:int, user:User=Depends(get_current_user), db:Session =Depends(get_db)):
     transaction = delete_cust_by_id(id=id, db=db)
     if transaction:
-        return Response({"Message":"Customer Deleted!"}, status_code=status.HTTP_202_ACCEPTED)
+        return Response(
+            content=json.dumps({"Message":"Customer Deleted!"}), 
+            status_code=status.HTTP_202_ACCEPTED, 
+            media_type="application/json"
+            )
     
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Customers Found, Create One!")
