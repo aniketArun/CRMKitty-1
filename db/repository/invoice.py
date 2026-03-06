@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from schemas.invoice import CreateInvoice, ShowInvoice, UpdateInvoice
 from db.models.user import User
 from datetime import datetime
+from .activity_log import create_log
+
 
 def create_new_invoice(invoice:CreateInvoice, by_user:User, db:Session):
     new_invoice = Invoice(
@@ -22,7 +24,14 @@ def create_new_invoice(invoice:CreateInvoice, by_user:User, db:Session):
     db.add(new_invoice)
     db.commit()
     db.refresh(new_invoice)
-
+    create_log(
+        db, 
+        description=f"Invoice Generated Due {new_invoice.due_date}", 
+        created_by = by_user.id,
+        customer_id = new_invoice.customer_id,
+        invoice_id = new_invoice.id,
+        company_id = by_user.company_id
+        )
     return new_invoice
 
 
@@ -37,7 +46,7 @@ def get_invoice_by_id(id:int, db:Session):
     return inv_in_db
 
 def update_invoice_by_id(id:int, data:UpdateInvoice, by_user:User, db:Session):
-    inv_in_db = db.query(Invoice).filter(Invoice.id==id).first()
+    inv_in_db:Invoice = db.query(Invoice).filter(Invoice.id==id).first()
     if inv_in_db is None:
         return
     
@@ -52,14 +61,28 @@ def update_invoice_by_id(id:int, data:UpdateInvoice, by_user:User, db:Session):
     db.add(inv_in_db)
     db.commit()
     db.refresh(inv_in_db)
+    create_log(
+        db, 
+        description=f"Invoice Upadted Due {inv_in_db.due_date}", 
+        created_by = by_user.id,
+        customer_id = inv_in_db.customer_id,
+        invoice_id = inv_in_db.id,
+        company_id = by_user.company_id
+        )
     return inv_in_db
 
 
-def delete_invoice_by_id(id:int, db:Session):
-    invoice = db.query(Invoice).filter(Invoice.id == id).first()
+def delete_invoice_by_id(id:int, db:Session, by_user:User = None):
+    invoice:Invoice = db.query(Invoice).filter(Invoice.id == id).first()
     if not invoice:
         return False
     db.delete(invoice)
     db.commit()
+    create_log(
+        db, 
+        description=f"Invoice Deletd Due {invoice.due_date}", 
+        created_by = by_user.id,
+        customer_id = invoice.customer_id,
+        )
     return True
 

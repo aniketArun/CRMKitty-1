@@ -3,8 +3,9 @@ from db.models.report import Report
 from schemas.report import CreateReport, UpdateReport
 from db.models.user import User
 from datetime import datetime
+from .activity_log import create_log
 
-def create_new_report(report:CreateReport, db:Session):
+def create_new_report(report:CreateReport, db:Session, by_user:User = None):
     new_report = Report(
         company_id=report.company_id,
         title = report.title,
@@ -18,7 +19,13 @@ def create_new_report(report:CreateReport, db:Session):
     db.add(new_report)
     db.commit()
     db.refresh(new_report)
-
+    create_log(
+        db, 
+        description=f"Report creatded {new_report.title}", 
+        created_by = by_user.id,
+        customer_id = new_report.customer_id,
+        company_id = new_report.company_id
+        )
     return new_report
 
 

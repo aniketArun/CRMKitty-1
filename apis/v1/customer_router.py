@@ -78,7 +78,7 @@ def update_customer(id:int, data:UpdateCustomer, by_user:User = Depends(get_curr
 
 @router.delete("/{id}", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.CUSTOMER_DELETE))])
 def delete_customer(id:int, user:User=Depends(get_current_user), db:Session =Depends(get_db)):
-    transaction = delete_cust_by_id(id=id, db=db)
+    transaction = delete_cust_by_id(id=id, db=db, by_user=user)
     if transaction:
         return Response(
             content=json.dumps({"Message":"Customer Deleted!"}), 

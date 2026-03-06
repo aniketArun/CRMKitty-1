@@ -2,8 +2,7 @@ from sqlalchemy.orm import Session
 from db.models.lead import Lead
 from db.models.user import User
 from schemas.lead import CreateLead, UpdateLead
-
-from fastapi import HTTPException, status
+from .activity_log import create_log
 from datetime import datetime
 
 from core.enums import Status
@@ -34,11 +33,18 @@ def create_new_lead(lead: CreateLead, db: Session, created_by_user:User):
     db.add(new_lead)
     db.commit()
     db.refresh(new_lead)
+    create_log(
+        db, 
+        description=f"Lead Created {new_lead.first_name}", 
+        created_by = created_by_user.id,
+        lead_id = new_lead.id,
+        company_id = created_by_user.company_id
+        )
     return new_lead
 
 
 def update_lead_by_id(id:int, lead: UpdateLead, db: Session, by_user:User):
-    lead_in_db = db.query(Lead).filter(Lead.id==id).first()
+    lead_in_db:Lead = db.query(Lead).filter(Lead.id==id).first()
     if lead_in_db is None:
         return
     
@@ -53,6 +59,13 @@ def update_lead_by_id(id:int, lead: UpdateLead, db: Session, by_user:User):
     db.add(lead_in_db)
     db.commit()
     db.refresh(lead_in_db)
+    create_log(
+        db, 
+        description=f"Lead Updated {lead_in_db.first_name}", 
+        created_by = by_user.id,
+        lead_id = lead_in_db.id,
+        company_id = by_user.company_id
+        )
     return lead_in_db
 
 
@@ -64,10 +77,16 @@ def show_all_leads(user:User, db:Session):
     return all_leads
 
 
-def delete_lead_by_id(id:int,db:Session):
-    lead = db.query(Lead).filter(Lead.id == id).first()
+def delete_lead_by_id(id:int,db:Session, by_user:User):
+    lead:Lead = db.query(Lead).filter(Lead.id == id).first()
     if not lead:
         return False
     db.delete(lead)
     db.commit()
+    create_log(
+        db, 
+        description=f"Lead Deleted {lead.first_name}", 
+        created_by = by_user.id,
+        company_id = by_user.company_id
+        )
     return True

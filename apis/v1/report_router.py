@@ -24,8 +24,8 @@ router = APIRouter()
         status_code=status.HTTP_201_CREATED,
         dependencies=[Depends(require_permission(Permission.REPORT_CREATE))]
         )
-def create_report(report:CreateReport, db:Session = Depends(get_db)):
-    new_report = create_new_report(report=report, db=db)
+def create_report(report:CreateReport, db:Session = Depends(get_db), user:User = Depends(get_current_user)):
+    new_report = create_new_report(report=report, db=db, by_user=user)
 
     if new_report is None:
         raise HTTPException(detail="Failed to create new report", status_code=status.HTTP_406_NOT_ACCEPTABLE)

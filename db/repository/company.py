@@ -3,6 +3,8 @@ from db.models.company import Company
 from schemas.company import UpdateCompany, CreateCompany
 from db.models.user import User
 from datetime import datetime
+from .activity_log import create_log
+
 def get_company_from_user_id(id:int, db:Session):
     cp = db.query(Company).filter(id = id).first()
 
@@ -32,7 +34,7 @@ def create_new_company(cp:CreateCompany, db:Session):
     db.add(new_cp)
     db.commit()
     db.refresh(new_cp)
-
+    create_log(db, description=f"Company {cp.name} is registerd")
     return new_cp
 
 
@@ -56,5 +58,6 @@ def update_company_by_id(id: int, user: User, data: UpdateCompany, db: Session):
     db.add(cp_in_db)
     db.commit()
     db.refresh(cp_in_db)
+    create_log(db, description=f"Company {cp_in_db.name} is updated", updated_by = user.id)
 
     return cp_in_db

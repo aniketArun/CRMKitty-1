@@ -3,6 +3,7 @@ from db.models.product import Product
 from schemas.product import CreateProduct, ShowProduct, UpdateProduct
 from db.models.user import User
 from datetime import datetime
+from .activity_log import create_log
 
 def create_new_product(product:CreateProduct, by_user:User, db:Session):
     new_product = Product(
@@ -22,7 +23,13 @@ def create_new_product(product:CreateProduct, by_user:User, db:Session):
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
-    
+    create_log(
+        db, 
+        description=f"New Product Created {new_product.product_name}", 
+        created_by = by_user.id,
+        company_id = by_user.company_id,
+        product_id = new_product.id
+        )    
     return new_product
 
 
@@ -38,7 +45,7 @@ def get_product_by_id(id:int, db:Session):
     return product_in_db
 
 def update_product_by_id(id:int, data:UpdateProduct, by_user:User, db:Session):
-    product_in_db = db.query(Product).filter(Product.id == id).first()
+    product_in_db:Product = db.query(Product).filter(Product.id == id).first()
     
     if product_in_db is None:
         return
@@ -54,12 +61,25 @@ def update_product_by_id(id:int, data:UpdateProduct, by_user:User, db:Session):
     db.add(product_in_db)
     db.commit()
     db.refresh(product_in_db)
+    create_log(
+        db, 
+        description=f"Product Updated {product_in_db.product_name}", 
+        created_by = by_user.id,
+        product_id = product_in_db.id,
+        company_id = by_user.company_id
+        )    
     return product_in_db
 
-def delete_product_by_id(id:int, db:Session):
-    product_in_db = db.query(Product).filter(Product.id == id).first()
+def delete_product_by_id(id:int, db:Session, by_user:User):
+    product_in_db:Product = db.query(Product).filter(Product.id == id).first()
     if not product_in_db:
         return False
     db.delete(product_in_db)
     db.commit()
+    create_log(
+        db, 
+        description=f"Product Deleted {product_in_db.product_name}", 
+        created_by = by_user.id,
+        company_id = by_user.company_id
+        )    
     return True   

@@ -77,7 +77,7 @@ def delete_lead(
     db:Session = Depends(get_db), 
     user:User = Depends(get_current_user)
     ):
-    db_lead = delete_lead_by_id(id=id, db=db)
+    db_lead = delete_lead_by_id(id=id, db=db, by_user=user)
     if db_lead is False:
         raise HTTPException(detail=f"No lead fount with id {id}", status_code=status.HTTP_404_NOT_FOUND)
     return Response( 

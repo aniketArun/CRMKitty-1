@@ -3,6 +3,7 @@ from db.models.customer import Customer
 from schemas.customer import CreateCustomer, ShowCustomer, UpdateCustomer
 from db.models.user import User
 from datetime import datetime
+from .activity_log import create_log
 
 def create_new_customer(customer:CreateCustomer, by_user:User, db:Session):
     new_customer = Customer(
@@ -21,7 +22,13 @@ def create_new_customer(customer:CreateCustomer, by_user:User, db:Session):
     db.add(new_customer)
     db.commit()
     db.refresh(new_customer)
-
+    create_log(
+        db, 
+        description=f"Customer {new_customer.first_name}{new_customer.last_name} is created", 
+        created_by = by_user.id,
+        customer_id = new_customer.id,
+        company_id = by_user.company_id
+        )
     return new_customer
 
 
@@ -36,7 +43,7 @@ def get_customer_by_id(id:int, db:Session):
     return customer_in_db
 
 def update_cust_by_id(id:int, data:UpdateCustomer, by_user:User, db:Session):
-    cust_in_db  = db.query(Customer).filter(Customer.id == id).first()
+    cust_in_db:Customer  = db.query(Customer).filter(Customer.id == id).first()
 
     if cust_in_db is None:
         return
@@ -51,13 +58,26 @@ def update_cust_by_id(id:int, data:UpdateCustomer, by_user:User, db:Session):
     db.add(cust_in_db)
     db.commit()
     db.refresh(cust_in_db)
+    create_log(
+    db, 
+    description=f"Customer {cust_in_db.first_name}{cust_in_db.last_name} is created", 
+    created_by = by_user.id,
+    customer_id = cust_in_db.id,
+    company_id = by_user.company_id
+    )
     return cust_in_db
 
 
-def delete_cust_by_id(id:int,db:Session):
-    cust = db.query(Customer).filter(Customer.id == id).first()
+def delete_cust_by_id(id:int, db:Session, by_user:User = None):
+    cust:Customer = db.query(Customer).filter(Customer.id == id).first()
     if not cust:
         return False
     db.delete(cust)
     db.commit()
+    create_log(
+    db, 
+    description=f"Customer {cust.first_name}{cust.last_name} is Deleted", 
+    created_by = by_user.id,
+    comapany_id = by_user.company_id,
+    )
     return True

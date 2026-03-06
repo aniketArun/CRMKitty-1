@@ -75,7 +75,7 @@ def update_invoice(id:int, data:UpdateInvoice, by_user:User = Depends(get_curren
 
 @router.delete("/{id}", status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(require_permission(Permission.INVOICE_DELETE))])
 def delete_invoice(id:int, by_user: User = Depends(get_current_user), db:Session = Depends(get_db)):
-    invoice_deleted = delete_invoice_by_id(id=id, db=db)
+    invoice_deleted = delete_invoice_by_id(id=id, db=db, by_user=by_user)
 
     if invoice_deleted:
         return Response(content=json.dumps({"Mesaage":"invoice deleted!"}), status_code=status.HTTP_200_OK, media_type="application/json")
