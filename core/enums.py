@@ -25,6 +25,7 @@ class PaymentMethod(Enum):
     UPI:str = "upi"
 
 class Permission(str, Enum):
+    SITE_ACTIVITY = "site:activity"
     REPORT_CREATE = "report:create"
     REPORT_READ = "report:read"
     REPORT_UPDATE = "report:update"

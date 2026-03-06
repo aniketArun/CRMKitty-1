@@ -17,5 +17,5 @@ class ActivityLog(Base):
     created_by = Column(Integer, nullable=True)
     company_id = Column(Integer, nullable=True)
     follow_up_id = Column(Integer, nullable=True)
-    created_by = Column(Integer, nullable=True)
+    invoice_id = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
